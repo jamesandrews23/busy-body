@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import axios from "axios";
+import NewsTiles from "./NewsTiles";
 
 
 const xmlParser = new DOMParser();
@@ -98,23 +99,13 @@ function convertXmlToJson(result){
         let channel = xml.querySelector("channel").children;
         parse(channel, obj);
         console.log(obj);
+        return obj;
     }
 }
 
-Promise.all([getCnnFeed(), getBbcFeed(), getFoxFeed(), getWsjFeed(), getWeatherFeed(), getEspnFeed(),
-    getLifeHackerFeed(), getNytFeed(), getLocFeed()])
-    .then(function (results) {
-        const cnn = convertXmlToJson(results[0]);
-        const bbc = results[1];
-        const fox = results[2];
-        // let abc = "http://my.abcnews.go.com/rsspublic/world_rss093.xml";
-        const wsj = results[3];
-        const weather = results[4];
-        const espn = results[5];
-        const lifeHacker = results[6];
-        const nyt = results[7];
-        const loc = results[8];
-    });
+let cnn = [];
+
+
 
 // function getFeeds() {
 //     let cnn = "http://rss.cnn.com/rss/cnn_topstories.rss";
@@ -141,12 +132,48 @@ Promise.all([getCnnFeed(), getBbcFeed(), getFoxFeed(), getWsjFeed(), getWeatherF
 //     });
 // }
 
-function App() {
-    return (
-        <div className="App">
-            test
-        </div>
-    );
+// function App() {
+//     return (
+//         <div className="App">
+//             <NewsTiles items={cnn.item}/>
+//         </div>
+//     );
+// }
+
+class App extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            cards: []
+        }
+    }
+
+    componentDidMount(){
+        var that = this;
+        Promise.all([getCnnFeed(), getBbcFeed(), getFoxFeed(), getWsjFeed(), getWeatherFeed(), getEspnFeed(),
+            getLifeHackerFeed(), getNytFeed(), getLocFeed()])
+            .then(function (results) {
+                cnn = convertXmlToJson(results[0]);
+                that.setState({cards: cnn.item});
+                const bbc = results[1];
+                const fox = results[2];
+                // let abc = "http://my.abcnews.go.com/rsspublic/world_rss093.xml";
+                const wsj = results[3];
+                const weather = results[4];
+                const espn = results[5];
+                const lifeHacker = results[6];
+                const nyt = results[7];
+                const loc = results[8];
+            });
+    }
+
+    render(){
+        return (
+            <div>
+                <NewsTiles cards={this.state.cards}/>
+            </div>
+        )
+    }
 }
 
 export default App;
