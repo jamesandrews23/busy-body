@@ -123,11 +123,8 @@ export default function NewsTiles(props) {
                                         </Typography>
                                     </CardContent>
                                     <CardActions>
-                                        <Button size="small" color="primary">
+                                        <Button size="small" color="primary" onClick={()=>{window.location = card.link}}>
                                             View
-                                        </Button>
-                                        <Button size="small" color="primary">
-                                            Edit
                                         </Button>
                                     </CardActions>
                                 </Card>
