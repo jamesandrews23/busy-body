@@ -4,7 +4,7 @@ import axios from "axios";
 import NewsTiles from "./NewsTiles";
 
 
-const xmlParser = new DOMParser();
+const domParser = new DOMParser();
 const proxy = "https://cors-anywhere.herokuapp.com/";
 
 function getCnnFeed() {
@@ -77,7 +77,8 @@ function parse(list, obj){
                 setObjectType(obj, node);
                 parse(node.children, Array.isArray(obj[node.nodeName]) ? obj[node.nodeName][obj[node.nodeName].length - 1] : obj[node.nodeName]); //send obj with that name
             } else {
-                obj[node.nodeName] = node.textContent;
+                let doc = domParser.parseFromString(node.textContent, 'text/html');
+                obj[node.nodeName] = doc.body.textContent || "";
             }
         }
     }
@@ -94,7 +95,7 @@ function parse(list, obj){
  */
 function convertXmlToJson(result){
     let obj = {};
-    let xml = xmlParser.parseFromString(result.data, "application/xml");
+    let xml = domParser.parseFromString(result.data, "application/xml");
     if(xml){
         let channel = xml.querySelector("channel").children;
         parse(channel, obj);
