@@ -154,6 +154,7 @@ class App extends React.Component {
         Promise.all([getCnnFeed(), getBbcFeed(), getFoxFeed(), getWsjFeed(), getWeatherFeed(), getEspnFeed(),
             getLifeHackerFeed(), getNytFeed(), getLocFeed()])
             .then(function (results) {
+                let articles = [];
                 cnn = convertXmlToJson(results[0]);
                 that.setState({cards: cnn.item});
                 const bbc = results[1];

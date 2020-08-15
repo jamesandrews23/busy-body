@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
+import CardHeader from '@material-ui/core/CardHeader';
 
 function Copyright() {
     return (
@@ -103,12 +104,26 @@ export default function NewsTiles(props) {
                         </div>
                     </Container>
                 </div>
-                <Container className={classes.cardGrid} maxWidth="md">
+                <Container className={classes.cardGrid} maxWidth="lg">
                     {/* End hero unit */}
                     <Grid container spacing={4}>
                         {props.cards.length > 0 && props.cards.map((card, index) => (
                             <Grid item key={index} xs={12} sm={6} md={4}>
                                 <Card className={classes.card}>
+                                    <CardHeader
+                                        // avatar={
+                                        //     <Avatar aria-label="recipe" className={classes.avatar}>
+                                        //         R
+                                        //     </Avatar>
+                                        // }
+                                        // action={
+                                        //     <IconButton aria-label="settings">
+                                        //         <MoreVertIcon />
+                                        //     </IconButton>
+                                        // }
+                                        // title="Shrimp and Chorizo Paella"
+                                        subheader={card.pubDate}
+                                    />
                                     <CardMedia
                                         className={classes.cardMedia}
                                         image={card["media:group"] && card["media:group"]["media:content"] && card["media:group"]["media:content"][1]["@url"]}
