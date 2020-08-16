@@ -128,7 +128,8 @@ export default function NewsTiles(props) {
                                             />
                                             <CardMedia
                                                 className={classes.cardMedia}
-                                                image={card["media:group"] && card["media:group"]["media:content"] && card["media:group"]["media:content"][1]["@url"]}
+                                                image={card["media:group"] && card["media:group"]["media:content"] && card["media:group"]["media:content"][1]["@url"]
+                                                    ? card["media:group"]["media:content"][1]["@url"] : this.image.url}
                                                 title="Image title"
                                             />
                                             <CardContent className={classes.cardContent}>
