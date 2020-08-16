@@ -145,7 +145,7 @@ class App extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            cards: []
+            rss: []
         }
     }
 
@@ -156,8 +156,7 @@ class App extends React.Component {
             .then(function (results) {
                 let articles = [];
                 cnn = convertXmlToJson(results[0]);
-                that.setState({cards: cnn.item});
-                const bbc = results[1];
+                const bbc = convertXmlToJson(results[1]);
                 const fox = results[2];
                 // let abc = "http://my.abcnews.go.com/rsspublic/world_rss093.xml";
                 const wsj = results[3];
@@ -166,13 +165,15 @@ class App extends React.Component {
                 const lifeHacker = results[6];
                 const nyt = results[7];
                 const loc = results[8];
+                that.setState({rss: [cnn, bbc]});
+
             });
     }
 
     render(){
         return (
             <div>
-                <NewsTiles cards={this.state.cards}/>
+                <NewsTiles rss={this.state.rss}/>
             </div>
         )
     }
