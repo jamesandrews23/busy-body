@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import axios from "axios";
 import NewsTiles from "./NewsTiles";
+import _ from 'lodash';
 
 
 const domParser = new DOMParser();
@@ -56,31 +57,35 @@ function setObjectType(obj, node){
     }
 }
 
-function parse(list, obj){
-    for(var i = 0; i < list.length; i++){
-        let node = list[i];
-        if(node){
-            if(node.hasAttributes()){
-                setObjectType(obj, node);
-                let attributes = node.getAttributeNames(); //an array of attribute names
-                let objAttributes = {};
-                for(var j = 0; j < attributes.length; j++){
-                    objAttributes["@" + attributes[j]] = node.getAttribute(attributes[j]);
-                }
-                objAttributes["#text"] = node.textContent;
-                if(Array.isArray(obj[node.nodeName])){
-                    obj[node.nodeName][obj[node.nodeName].length - 1] = objAttributes;
+function parse(xmlDoc, obj){
+    if(xmlDoc){
+        for(var i = 0; i < xmlDoc.length; i++){
+            let node = xmlDoc[i];
+            if(node){
+                if(node.hasAttributes()){
+                    setObjectType(obj, node);
+                    let attributes = node.getAttributeNames(); //an array of attribute names
+                    let objAttributes = {};
+                    for(var j = 0; j < attributes.length; j++){
+                        objAttributes["@" + attributes[j]] = node.getAttribute(attributes[j]);
+                    }
+                    objAttributes["#text"] = node.textContent;
+                    if(Array.isArray(obj[node.nodeName])){
+                        obj[node.nodeName][obj[node.nodeName].length - 1] = objAttributes;
+                    } else {
+                        obj[node.nodeName] = objAttributes;
+                    }
+                } else if(node.children.length > 0){
+                    setObjectType(obj, node);
+                    parse(node.children, Array.isArray(obj[node.nodeName]) ? obj[node.nodeName][obj[node.nodeName].length - 1] : obj[node.nodeName]); //send obj with that name
                 } else {
-                    obj[node.nodeName] = objAttributes;
+                    let doc = domParser.parseFromString(node.textContent, 'text/html');
+                    obj[node.nodeName] = doc.body.textContent || "";
                 }
-            } else if(node.children.length > 0){
-                setObjectType(obj, node);
-                parse(node.children, Array.isArray(obj[node.nodeName]) ? obj[node.nodeName][obj[node.nodeName].length - 1] : obj[node.nodeName]); //send obj with that name
-            } else {
-                let doc = domParser.parseFromString(node.textContent, 'text/html');
-                obj[node.nodeName] = doc.body.textContent || "";
             }
         }
+    } else {
+        console.error("List is not defined");
     }
 }
 /*
@@ -93,53 +98,21 @@ function parse(list, obj){
  6	<e> <a>text</a> <a>text</a> </e>	"e": { "a": ["text", "text"] }	                o.e.a[0] o.e.a[1]
  7	<e> text <a>text</a> </e>	        "e": { "#text": "text", "a": "text" }	        o.e["#text"] o.e.a
  */
-function convertXmlToJson(result){
+function convertXmlToJson(xmlString){
     let obj = {};
-    let xml = domParser.parseFromString(result.data, "application/xml");
+    let xml = domParser.parseFromString(xmlString, "application/xml");
     if(xml){
-        let channel = xml.querySelector("channel").children;
-        parse(channel, obj);
-        console.log(obj);
-        return obj;
+        let channel = xml.querySelector("channel");
+        if(channel){
+            parse(channel.children, obj);
+            console.log(obj);
+        } else {
+            console.error("Invalid Feed", xml);
+        }
+
     }
+    return obj;
 }
-
-let cnn = [];
-
-
-
-// function getFeeds() {
-//     let cnn = "http://rss.cnn.com/rss/cnn_topstories.rss";
-//     let bbc = "http://feeds.bbci.co.uk/news/rss.xml?edition=uk#";
-//
-//
-//     let feeds = [];
-//
-//     feeds.push(cnn, bbc, fox, wsj, weather, espn, lifeHacker, nyt, loc);
-//
-//     feeds.map((feed) => {
-//         axios.get("https://cors-anywhere.herokuapp.com/" + feed, {
-//             headers: {
-//                 'Accept':'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8',
-//                 'Content-type':'application/x-www-form-urlencoded'
-//             }
-//         })
-//         .then((response) => {
-//             console.log(response.data);
-//         })
-//         .catch((error) => {
-//
-//         })
-//     });
-// }
-
-// function App() {
-//     return (
-//         <div className="App">
-//             <NewsTiles items={cnn.item}/>
-//         </div>
-//     );
-// }
 
 class App extends React.Component {
     constructor(props){
@@ -154,19 +127,13 @@ class App extends React.Component {
         Promise.all([getCnnFeed(), getBbcFeed(), getFoxFeed(), getWsjFeed(), getWeatherFeed(), getEspnFeed(),
             getLifeHackerFeed(), getNytFeed(), getLocFeed()])
             .then(function (results) {
-                let articles = [];
-                cnn = convertXmlToJson(results[0]);
-                const bbc = convertXmlToJson(results[1]);
-                const fox = results[2];
-                // let abc = "http://my.abcnews.go.com/rsspublic/world_rss093.xml";
-                const wsj = results[3];
-                const weather = results[4];
-                const espn = results[5];
-                const lifeHacker = results[6];
-                const nyt = results[7];
-                const loc = results[8];
-                that.setState({rss: [cnn, bbc]});
-
+                let feeds = results.map(function(result) {
+                    let objFeed = convertXmlToJson(result.data);
+                    if(!_.isEmpty(objFeed)){
+                        return objFeed;
+                    }
+                });
+                that.setState({rss: feeds});
             });
     }
 
