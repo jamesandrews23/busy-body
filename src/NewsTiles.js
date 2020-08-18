@@ -60,7 +60,21 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+function getImageUrl(card, feed){
+    let url = "";
+
+    if(card["media:content"] && card["media:content"]["@url"]){
+        url = card["media:content"]["@url"];
+    } else if(card["media:group"] && card["media:group"]["media:content"] && card["media:group"]["media:content"][1]["@url"]){
+        url = card["media:group"]["media:content"][1]["@url"];
+    } else {
+        if(feed.image && feed.image.url){
+            url = feed.image.url;
+        }
+    }
+
+    return url;
+}
 
 export default function NewsTiles(props) {
     const classes = useStyles();
@@ -128,8 +142,7 @@ export default function NewsTiles(props) {
                                             />
                                             <CardMedia
                                                 className={classes.cardMedia}
-                                                image={card["media:group"] && card["media:group"]["media:content"] && card["media:group"]["media:content"][1]["@url"]
-                                                    ? card["media:group"]["media:content"][1]["@url"] : this.image && this.image.url ? this.image.url : ""}
+                                                image={getImageUrl(card, this)}
                                                 title="Image title"
                                             />
                                             <CardContent className={classes.cardContent}>

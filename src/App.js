@@ -36,7 +36,7 @@ function getLifeHackerFeed(){
 }
 
 function getNytFeed(){
-    return axios.get(proxy + "https://archive.nytimes.com/www.nytimes.com/services/xml/rss/index.html?mcubz=0");
+    return axios.get(proxy + "https://rss.nytimes.com/services/xml/rss/nyt/US.xml");
 }
 
 function getLocFeed(){
