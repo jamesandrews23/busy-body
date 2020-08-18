@@ -4,6 +4,7 @@ import axios from "axios";
 import NewsTiles from "./NewsTiles";
 import _ from 'lodash';
 import convertXmlToJson from './Parser';
+import Main from './Main';
 
 const proxy = "https://cors-anywhere.herokuapp.com/";
 
@@ -69,7 +70,7 @@ class App extends React.Component {
     render(){
         return (
             <div>
-                <NewsTiles rss={this.state.rss}/>
+                <Main rss={this.state.rss}/>
             </div>
         )
     }
