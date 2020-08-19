@@ -1,7 +1,6 @@
 import React from "react";
 import "./App.css";
 import axios from "axios";
-import NewsTiles from "./NewsTiles";
 import _ from 'lodash';
 import convertXmlToJson from './Parser';
 import Main from './Main';
@@ -44,18 +43,50 @@ function getLocFeed(){
     return axios.get(proxy + "http://www.loc.gov/rss/pao/news.xml");
 }
 
+function getAlgFeed(){
+    return axios.get(proxy + "https://www.feedspot.com/infiniterss.php?_src=followbtn&followfeedid=4275711&q=site:http%3A%2F%2Fwww.aljazeera.com%2Fxml%2Frss%2Fall.xml");
+}
+
+function getYahooFeed(){
+    return axios.get(proxy + "https://www.yahoo.com/news/rss/world");
+}
+
 class App extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            rss: []
+            rss: [],
+            rssOriginal: []
+        };
+
+        this.search = this.search.bind(this);
+    }
+
+    search(e){
+        let searchValue = e.target.value;
+        let searchResult = this.state.rss.slice();
+        let regSearchValue = new RegExp(searchValue, 'gi');
+
+        for(var i=0; i<this.state.rss.length; i++){
+            let rssFeed = this.state.rss[i];
+            let items = rssFeed["item"] || [];
+            let itemsResult = [];
+            for(var j=0; j<items.length; j++){
+                let item = items[j] || {};
+                let desc = item["description"] || "";
+                let found = desc.search(regSearchValue);
+                if(found !== -1){
+                    itemsResult.push(item);
+                }
+            }
+            rssFeed["item"] = itemsResult;
         }
     }
 
     componentDidMount(){
         var that = this;
         Promise.all([getCnnFeed(), getBbcFeed(), getFoxFeed(), getWsjFeed(), getWeatherFeed(), getEspnFeed(),
-            getLifeHackerFeed(), getNytFeed(), getLocFeed()])
+            getLifeHackerFeed(), getNytFeed(), getYahooFeed()])
             .then(function (results) {
                 let feeds = results.map(function(result) {
                     let objFeed = convertXmlToJson(result.data);
@@ -70,7 +101,7 @@ class App extends React.Component {
     render(){
         return (
             <div>
-                <Main rss={this.state.rss}/>
+                <Main rss={this.state.rss} search={this.search} />
             </div>
         )
     }
