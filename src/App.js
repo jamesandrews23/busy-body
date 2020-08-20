@@ -51,35 +51,45 @@ function getYahooFeed(){
     return axios.get(proxy + "https://www.yahoo.com/news/rss/world");
 }
 
+
+let rssOriginal = [];
+
 class App extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            rss: [],
-            rssOriginal: []
+            rss: []
         };
 
         this.search = this.search.bind(this);
     }
 
     search(e){
-        let searchValue = e.target.value;
-        let searchResult = this.state.rss.slice();
-        let regSearchValue = new RegExp(searchValue, 'gi');
+        let value = e.target.value;
+        if(value === ""){
+            this.setState({rss: rssOriginal});
+            return;
+        }
 
-        for(var i=0; i<this.state.rss.length; i++){
-            let rssFeed = this.state.rss[i];
-            let items = rssFeed["item"] || [];
-            let itemsResult = [];
-            for(var j=0; j<items.length; j++){
-                let item = items[j] || {};
-                let desc = item["description"] || "";
-                let found = desc.search(regSearchValue);
-                if(found !== -1){
-                    itemsResult.push(item);
+        if(value.length >= 3){
+            let regSearchValue = new RegExp(value, 'gi');
+
+            this.setState({rss: []});
+
+            const feeds = _.cloneDeep(rssOriginal);
+
+            for(var i=0; i< feeds.length; i++){
+                let rssFeed = feeds[i];
+                let items = rssFeed && rssFeed["item"] ? rssFeed["item"] : [];
+                if(items && rssFeed){
+                    rssFeed["item"] = items.filter((item) => {
+                        return (item && item["description"] && (item["description"].search(regSearchValue) !== -1))
+                            || (item && item["title"] && (item["title"].search(regSearchValue) !== -1));
+                    });
                 }
             }
-            rssFeed["item"] = itemsResult;
+
+            this.setState({rss: feeds});
         }
     }
 
@@ -95,6 +105,7 @@ class App extends React.Component {
                     }
                 });
                 that.setState({rss: feeds});
+                rssOriginal = feeds;
             });
     }
 
