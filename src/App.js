@@ -29,9 +29,7 @@ class App extends React.Component {
         if(value.length >= 3){
             let regSearchValue = new RegExp(value, 'gi');
 
-            this.setState({rss: []});
-
-            const feeds = _.cloneDeep(rssOriginal);
+            const feeds = _.cloneDeep(this.state.rss);
 
             for(var i=0; i< feeds.length; i++){
                 let rssFeed = feeds[i];
