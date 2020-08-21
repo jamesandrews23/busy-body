@@ -107,7 +107,7 @@ export default function Main(props){
     return (
         <React.Fragment>
             <CssBaseline />
-            <AppBar position="relative">
+            <AppBar position="sticky">
                 <Toolbar>
                     <RssFeedIcon/>
                     <Typography variant="h6" color="inherit" noWrap>
