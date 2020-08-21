@@ -10,6 +10,7 @@ import RssFeedIcon from '@material-ui/icons/RssFeed';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
+import SortBySelect from './SortBySelect';
 
 function Copyright() {
     return (
@@ -90,6 +91,13 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('md')]: {
             width: '20ch',
         },
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+    },
+    selectEmpty: {
+        marginTop: theme.spacing(2),
     }
 }));
 
@@ -119,6 +127,7 @@ export default function Main(props){
                             onChange={props.search}
                         />
                     </div>
+                    <SortBySelect rss={props.rss} />
                 </Toolbar>
             </AppBar>
             <main>

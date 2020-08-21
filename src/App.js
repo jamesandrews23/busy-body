@@ -46,6 +46,13 @@ class App extends React.Component {
         }
     }
 
+    sort(feed){
+        // const rss = _.cloneDeep(this.state.rss);
+        // for(var i=0; i<rss.length; i++){
+        //
+        // }
+    }
+
     componentDidMount(){
         var that = this;
         Promise.all(getFeeds())
@@ -67,7 +74,7 @@ class App extends React.Component {
     render(){
         return (
             <div>
-                <Main rss={this.state.rss} search={this.search} />
+                <Main rss={this.state.rss} search={this.search} handleSortByChange={this.sort} />
             </div>
         )
     }
