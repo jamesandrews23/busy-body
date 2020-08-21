@@ -34,7 +34,9 @@ export default function SortBySelect(props){
     const [sortBy, setSortBy] = React.useState('');
 
     const handleChange = (event) => {
-        setSortBy(event.target.value);
+        let value = event.target.value;
+        setSortBy(value);
+        props.sort(value)
     };
 
     return (
@@ -59,8 +61,8 @@ export default function SortBySelect(props){
                 <MenuItem value="">
                     <em>None</em>
                 </MenuItem>
-                {props.rss && props.rss.length > 0 && props.rss.map((feed, index) => (
-                    feed && feed["title"] && <MenuItem key={index} value={feed["title"]}>{feed["title"]}</MenuItem>
+                {props.titles && props.titles.length > 0 && props.titles.map((title, index) => (
+                    <MenuItem key={index} value={title}>{title}</MenuItem>
                 ))}
             </Select>
         </FormControl>

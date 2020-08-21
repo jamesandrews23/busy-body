@@ -6,6 +6,7 @@ import Main from './Main';
 import {getFeeds} from './FeedFeeder';
 
 let rssOriginal = [];
+let rssTitles = [];
 
 class App extends React.Component {
     constructor(props){
@@ -15,6 +16,7 @@ class App extends React.Component {
         };
 
         this.search = this.search.bind(this);
+        this.sort = this.sort.bind(this);
     }
 
     search(e){
@@ -47,10 +49,19 @@ class App extends React.Component {
     }
 
     sort(feed){
-        // const rss = _.cloneDeep(this.state.rss);
-        // for(var i=0; i<rss.length; i++){
-        //
-        // }
+        if(feed === ""){
+            this.setState({rss: rssOriginal});
+            return;
+        }
+
+        const rssFeeds = _.cloneDeep(rssOriginal);
+        let foundFeed = rssFeeds.find(rss => (
+            rss && rss["title"] && rss["title"] === feed
+        ));
+
+        if(foundFeed){
+            this.setState({rss: [foundFeed]});
+        }
     }
 
     componentDidMount(){
@@ -63,8 +74,13 @@ class App extends React.Component {
                         return objFeed["channel"];
                     }
                 });
-                that.setState({rss: feeds});
                 rssOriginal = feeds;
+                feeds.forEach(feed => {
+                    if(feed){
+                        rssTitles.push(feed["title"]);
+                    }
+                });
+                that.setState({rss: feeds});
             })
             .catch((error) => {
                 console.log(error);
@@ -74,7 +90,7 @@ class App extends React.Component {
     render(){
         return (
             <div>
-                <Main rss={this.state.rss} search={this.search} handleSortByChange={this.sort} />
+                <Main rss={this.state.rss} titles={rssTitles} search={this.search} sort={this.sort} />
             </div>
         )
     }

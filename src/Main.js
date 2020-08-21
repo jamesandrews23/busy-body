@@ -127,7 +127,7 @@ export default function Main(props){
                             onChange={props.search}
                         />
                     </div>
-                    <SortBySelect rss={props.rss} />
+                    <SortBySelect titles={props.titles} sort={props.sort} />
                 </Toolbar>
             </AppBar>
             <main>
