@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -10,6 +10,10 @@ import {makeStyles} from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import CardHeader from "@material-ui/core/CardHeader";
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Pagination from '@material-ui/lab/Pagination';
+import Alert from '@material-ui/lab/Alert';
+import {paginate, getPageCount, getElementsPerPage} from './Paginate';
+
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -48,10 +52,14 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         margin: 'auto',
         textAlign: 'center'
+    },
+    margin: {
+        marginTop: '100px',
+        marginBottom: '100px'
     }
 }));
 
-function getImageUrl(card, feed){
+function getImageUrl(card){
     let url = "";
 
     if(card["media:content"] && card["media:content"]["@url"]){
@@ -59,8 +67,8 @@ function getImageUrl(card, feed){
     } else if(card["media:group"] && card["media:group"]["media:content"] && card["media:group"]["media:content"][1]["@url"]){
         url = card["media:group"]["media:content"][1]["@url"];
     } else {
-        if(feed.image && feed.image.url){
-            url = feed.image.url;
+        if(card.rssImage && card.rssImage.url){
+            url = card.rssImage.url;
         }
     }
 
@@ -69,61 +77,73 @@ function getImageUrl(card, feed){
 
 export default function NewsTiles(props) {
     const classes = useStyles();
+    const pageCount = getPageCount(props.rss.length);
+    const [page, setPage] = useState(1);
 
-    return props.rss.length > 0 ? (
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
+
+    const pages = paginate(props.rss, getElementsPerPage(), page);
+
+    return props.rss.length > 0 && !props.error ? (
         <Container className={classes.cardGrid} maxWidth="lg">
             {/* End hero unit */}
             <Grid container spacing={4}>
-                {props.rss.length > 0 && props.rss.map((rssFeed, index, list) => (
-                    rssFeed && rssFeed.item.length > 0 && rssFeed.item.map(function(card, index, list){
-                        return (
-                            <Grid item key={index} xs={12} sm={6} md={4}>
-                                <Card className={classes.card}>
-                                    <CardHeader
-                                        // avatar={
-                                        //     <Avatar aria-label="recipe" className={classes.avatar}>
-                                        //         R
-                                        //     </Avatar>
-                                        // }
-                                        // action={
-                                        //     <IconButton aria-label="settings">
-                                        //         <MoreVertIcon />
-                                        //     </IconButton>
-                                        // }
-                                        title={this.title}
-                                        subheader={card.pubDate}
-                                    />
-                                    <CardMedia
-                                        className={classes.cardMedia}
-                                        image={getImageUrl(card, this)}
-                                        title="Image title"
-                                    />
-                                    <CardContent className={classes.cardContent}>
-                                        <Typography gutterBottom variant="h5" component="h2">
-                                            {card.title}
-                                        </Typography>
-                                        <Typography>
-                                            {card.description}
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button size="small" color="primary" onClick={() => {
-                                            window.location = card.link
-                                        }}>
-                                            View
-                                        </Button>
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        )
-                    }, rssFeed)
-                ))
-                }
+                {pages.map((card, index, list) => (
+                    <Grid item key={index} xs={12} sm={6} md={4}>
+                        <Card className={classes.card}>
+                            <CardHeader
+                                // avatar={
+                                //     <Avatar aria-label="recipe" className={classes.avatar}>
+                                //         R
+                                //     </Avatar>
+                                // }
+                                // action={
+                                //     <IconButton aria-label="settings">
+                                //         <MoreVertIcon />
+                                //     </IconButton>
+                                // }
+                                title={card && card.rssTitle ? card.rssTitle : ""}
+                                subheader={card && card.pubDate ? card.pubDate : ""}
+                            />
+                            <CardMedia
+                                className={classes.cardMedia}
+                                image={getImageUrl(card)}
+                                title="Image title"
+                            />
+                            <CardContent className={classes.cardContent}>
+                                <Typography gutterBottom variant="h5" component="h2">
+                                    {card.title}
+                                </Typography>
+                                <Typography>
+                                    {card.description}
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button size="small" color="primary" onClick={() => {
+                                    window.location = card.link
+                                }}>
+                                    View
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+            <Grid container justify="center">
+                <div className={classes.root} style={{marginBottom: "50px", marginTop: "150px"}}>
+                    <Pagination count={pageCount} color="secondary" onChange={handleChange} />
+                </div>
             </Grid>
         </Container>
-    ) : (
+    ) : !props.error ? (
         <Grid container justify="center">
             <CircularProgress/>
+        </Grid>
+    ) : (
+        <Grid container justify="center">
+            <Alert severity="error" className={classes.margin}>Unable to load rss feeds. Please try again later.</Alert>
         </Grid>
     );
 

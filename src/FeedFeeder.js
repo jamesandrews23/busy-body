@@ -1,6 +1,8 @@
 import axios from "axios";
 
 const proxy = "https://cors-anywhere.herokuapp.com/";
+// const proxy = "https://cors-proxy.htmldriven.com/?url=";
+// const proxy = "http://www.whateverorigin.org/get?url=";
 
 class Feed {
     constructor(id, path){
@@ -26,7 +28,7 @@ const feeds = [new Feed('cnn', 'http://rss.cnn.com/rss/cnn_topstories.rss'),
 
 function getFeeds(){
     return feeds.map((feed) => {
-        return axios.get(proxy + feed.getPath()).catch(error => { console.log(error); });
+        return axios.get(proxy + encodeURI(feed.getPath()));
     });
 }
 
