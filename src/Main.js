@@ -10,6 +10,22 @@ import { fade, makeStyles } from '@material-ui/core/styles';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import SortBySelect from './SortBySelect';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+import Tooltip from '@material-ui/core/Tooltip';
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import TextField from "@material-ui/core/TextField/TextField";
+import DialogActions from "@material-ui/core/DialogActions/DialogActions";
+import axios from "axios";
+import convertXmlToJson from "./Parser";
+import {getProxy} from "./FeedFeeder";
+import CircularProgress from '@material-ui/core/CircularProgress';
+import clsx from 'clsx';
+import { green } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -80,11 +96,92 @@ const useStyles = makeStyles((theme) => ({
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
+    },
+    add: {
+        position: 'fixed',
+        bottom: theme.spacing(2),
+        right: theme.spacing(3)
+    },
+    root: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    wrapper: {
+        margin: theme.spacing(1),
+        position: 'relative',
+    },
+    buttonSuccess: {
+        backgroundColor: green[500],
+        '&:hover': {
+            backgroundColor: green[700],
+        },
     }
 }));
 
+
+
 export default function Main(props){
     const classes = useStyles();
+    const [open, setOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
+    const [success, setSuccess] = React.useState(false);
+
+    const buttonClassname = clsx({
+        [classes.buttonSuccess]: success,
+    });
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = (e) => {
+        setOpen(false);
+    };
+
+    const subscribe = () => {
+        let url = document.getElementById('name').value;
+        if(url){
+            const instance = axios.create();
+            instance.defaults.timeout = 2500;
+            // Add a request interceptor
+            instance.interceptors.request.use(function (config) {
+                setLoading(true);
+                return config;
+            }, function (error) {
+                // Do something with request error
+                return Promise.reject(error);
+            });
+
+            // Add a response interceptor
+            instance.interceptors.response.use(function (response) {
+                setLoading(false);
+                setSuccess(true);
+                return response;
+            }, function (error) {
+                // Any status codes that falls outside the range of 2xx cause this function to trigger
+                // Do something with response error
+                return Promise.reject(error);
+            });
+            return instance.get(getProxy() + encodeURI(url))
+                .then(response => {
+                    if(response.data){
+                        try {
+                            let convertedFeed = convertXmlToJson(response.data);
+                            if(convertedFeed){
+                                props.addFeed(convertedFeed);
+                            } else {
+                                return false;
+                            }
+                        } catch(error){
+
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
+    };
 
     return (
         <React.Fragment>
@@ -112,6 +209,7 @@ export default function Main(props){
                     <SortBySelect titles={props.titles} sort={props.sort} />
                 </Toolbar>
             </AppBar>
+
             <main>
                 {/* Hero unit */}
                 <div className={classes.heroContent}>
@@ -125,8 +223,43 @@ export default function Main(props){
                         </Typography>
                     </Container>
                 </div>
+                <Tooltip title="Add RSS Feed">
+                    <Fab color="secondary" aria-label="add" className={classes.add} onClick={handleClickOpen}>
+                        <AddIcon />
+                    </Fab>
+                </Tooltip>
                 <NewsTiles rss={props.rss} error={props.error} />
             </main>
+            <div>
+                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            To subscribe to an RSS feed please enter the URL here.
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="RSS Feed"
+                            type="email"
+                            fullWidth
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Cancel
+                        </Button>
+                        <div className={classes.wrapper}>
+                            <Button onClick={subscribe} color="primary" disabled={loading} className={buttonClassname}>
+                                Subscribe
+                            </Button>
+                            {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                        </div>
+
+                    </DialogActions>
+                </Dialog>
+            </div>
         </React.Fragment>
     );
 }

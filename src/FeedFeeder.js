@@ -40,4 +40,8 @@ function addFeed(id, path){
     }
 }
 
-export {getFeeds, addFeed};
+function getProxy(){
+    return proxy;
+}
+
+export {getFeeds, addFeed, getProxy};

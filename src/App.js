@@ -3,7 +3,7 @@ import "./App.css";
 import _ from 'lodash';
 import convertXmlToJson from './Parser';
 import Main from './Main';
-import {getFeeds} from './FeedFeeder';
+import {getFeeds, addFeed} from './FeedFeeder';
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 
 let rssOriginal = [];
@@ -128,11 +128,15 @@ class App extends React.Component {
         return convertedFeeds;
     }
 
+    addFeed(feed){
+        console.log(feed);
+    }
+
     render(){
         return (
             <div>
                 <ThemeProvider theme={theme}>
-                    <Main rss={this.state.rss} error={this.state.error} titles={rssTitles} search={this.search} sort={this.sort} />
+                    <Main rss={this.state.rss} error={this.state.error} titles={rssTitles} search={this.search} sort={this.sort} addFeed={this.addFeed} />
                 </ThemeProvider>
             </div>
         )
