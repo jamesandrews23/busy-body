@@ -12,6 +12,7 @@ import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import SortBySelect from './SortBySelect';
 
+
 function Copyright() {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
@@ -111,7 +112,7 @@ export default function Main(props){
                 <Toolbar>
                     <RssFeedIcon/>
                     <Typography variant="h6" color="inherit" noWrap>
-                        RSS Feeds
+                        RSS
                     </Typography>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>

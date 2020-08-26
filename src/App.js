@@ -4,9 +4,21 @@ import _ from 'lodash';
 import convertXmlToJson from './Parser';
 import Main from './Main';
 import {getFeeds} from './FeedFeeder';
+import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 
 let rssOriginal = [];
 let rssTitles = [];
+
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+            main: '#aa0000',
+        },
+        secondary: {
+            main: '#26a69a',
+        },
+    },
+});
 
 class App extends React.Component {
     constructor(props){
@@ -119,7 +131,9 @@ class App extends React.Component {
     render(){
         return (
             <div>
-                <Main rss={this.state.rss} error={this.state.error} titles={rssTitles} search={this.search} sort={this.sort} />
+                <ThemeProvider theme={theme}>
+                    <Main rss={this.state.rss} error={this.state.error} titles={rssTitles} search={this.search} sort={this.sort} />
+                </ThemeProvider>
             </div>
         )
     }
