@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
         color: "#fff"
     },
     selectEmpty: {
-        marginTop: theme.spacing(2),
+        // marginTop: theme.spacing(2),
         color: "#fff",
         "&:before": {
             border: "none"
