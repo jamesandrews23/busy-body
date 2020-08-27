@@ -77,37 +77,3 @@ class FeedFeeder {
 
 export default new FeedFeeder();
 
-
-
-// localStorage.setItem(feedKey, JSON.stringify(feeds));
-//
-// function getStoredFeeds(){
-//     try {
-//         return JSON.parse(localStorage.getItem(feedKey));
-//     } catch(e){
-//         return [];
-//     }
-// }
-//
-// function setStoredFeeds(feeds){
-//     localStorage.setItem(feedKey, feeds);
-// }
-//
-// function getFeeds(){
-//     let currentFeeds = getStoredFeeds();
-//
-//     return currentFeeds.map((feed) => {
-//         return axios.get(proxy + encodeURI(feed.getPath()));
-//     });
-// }
-//
-// function addAFeed(id, path){
-//     let currentFeeds = getStoredFeeds();
-//     currentFeeds.unshift(new Feed(id, path));
-//     setStoredFeeds(currentFeeds);
-// }
-//
-// function getProxy(){
-//     return proxy;
-// }
-

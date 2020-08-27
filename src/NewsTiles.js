@@ -14,6 +14,7 @@ import Pagination from '@material-ui/lab/Pagination';
 import Alert from '@material-ui/lab/Alert';
 import {paginate, getPageCount, getElementsPerPage} from './Paginate';
 import Link from "@material-ui/core/Link";
+import Grow from '@material-ui/core/Grow';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -116,44 +117,46 @@ export default function NewsTiles(props) {
                 {/* End hero unit */}
                 <Grid container spacing={4}>
                     {pages.map((card, index, list) => (
-                        <Grid item key={index} xs={12} sm={6} md={4}>
-                            <Card className={classes.card}>
-                                <CardHeader
-                                    // avatar={
-                                    //     <Avatar aria-label="recipe" className={classes.avatar}>
-                                    //         R
-                                    //     </Avatar>
-                                    // }
-                                    // action={
-                                    //     <IconButton aria-label="settings">
-                                    //         <MoreVertIcon />
-                                    //     </IconButton>
-                                    // }
-                                    title={card && card.rssTitle ? card.rssTitle : ""}
-                                    subheader={card && card.pubDate ? card.pubDate : ""}
-                                />
-                                <CardMedia
-                                    className={classes.cardMedia}
-                                    image={getImageUrl(card)}
-                                    title="Image title"
-                                />
-                                <CardContent className={classes.cardContent}>
-                                    <Typography gutterBottom variant="h5" component="h2">
-                                        {card.title}
-                                    </Typography>
-                                    <Typography>
-                                        {card.description}
-                                    </Typography>
-                                </CardContent>
-                                <CardActions>
-                                    <Button size="small" color="primary" onClick={() => {
-                                        window.location = card.link
-                                    }}>
-                                        View
-                                    </Button>
-                                </CardActions>
-                            </Card>
-                        </Grid>
+                        <Grow in={true}>
+                            <Grid item key={index} xs={12} sm={6} md={4}>
+                                <Card className={classes.card}>
+                                    <CardHeader
+                                        // avatar={
+                                        //     <Avatar aria-label="recipe" className={classes.avatar}>
+                                        //         R
+                                        //     </Avatar>
+                                        // }
+                                        // action={
+                                        //     <IconButton aria-label="settings">
+                                        //         <MoreVertIcon />
+                                        //     </IconButton>
+                                        // }
+                                        title={card && card.rssTitle ? card.rssTitle : ""}
+                                        subheader={card && card.pubDate ? card.pubDate : ""}
+                                    />
+                                    <CardMedia
+                                        className={classes.cardMedia}
+                                        image={getImageUrl(card)}
+                                        title="Image title"
+                                    />
+                                    <CardContent className={classes.cardContent}>
+                                        <Typography gutterBottom variant="h5" component="h2">
+                                            {card.title}
+                                        </Typography>
+                                        <Typography>
+                                            {card.description}
+                                        </Typography>
+                                    </CardContent>
+                                    <CardActions>
+                                        <Button size="small" color="primary" onClick={() => {
+                                            window.location = card.link
+                                        }}>
+                                            View
+                                        </Button>
+                                    </CardActions>
+                                </Card>
+                            </Grid>
+                        </Grow>
                     ))}
                 </Grid>
                 <Grid container justify="center">
