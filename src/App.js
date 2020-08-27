@@ -3,7 +3,7 @@ import "./App.css";
 import _ from 'lodash';
 import convertXmlToJson from './Parser';
 import Main from './Main';
-import {getFeeds, addFeed} from './FeedFeeder';
+import FeedFeeder from './FeedFeeder';
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 
 let rssOriginal = [];
@@ -75,7 +75,7 @@ class App extends React.Component {
 
     componentDidMount(){
         var that = this;
-        Promise.all(getFeeds())
+        Promise.all(FeedFeeder.getFeeds())
             .then((results) => {
                 let feeds = results.map(function(result) {
                     let objFeed = convertXmlToJson(result.data);
@@ -129,12 +129,13 @@ class App extends React.Component {
         return convertedFeeds;
     }
 
-    addFeed(addedFeed){
+    addFeed(feedToAdd, url){
         let newFeeds = [];
-        let transformedAddedFeed = this.transformFeeds(addedFeed);
+        let transformedAddedFeed = this.transformFeeds(feedToAdd);
         let currentFeeds = _.cloneDeep(this.state.rss);
         newFeeds = newFeeds.concat(transformedAddedFeed, currentFeeds);
         this.setState({rss: newFeeds});
+        FeedFeeder.addAFeed('', url);
     }
 
     render(){

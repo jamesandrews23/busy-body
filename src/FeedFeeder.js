@@ -1,9 +1,5 @@
 import axios from "axios";
 
-const proxy = "https://cors-anywhere.herokuapp.com/";
-// const proxy = "https://cors-proxy.htmldriven.com/?url=";
-// const proxy = "http://www.whateverorigin.org/get?url=";
-
 class Feed {
     constructor(id, path){
         this.id = id;
@@ -19,29 +15,99 @@ class Feed {
     }
 }
 
-const feeds = [new Feed('cnn', 'http://rss.cnn.com/rss/cnn_topstories.rss'),
-    new Feed('bbc', 'http://feeds.bbci.co.uk/news/rss.xml#'),
-    new Feed('fox', 'http://feeds.foxnews.com/foxnews/latest'),
-    new Feed('wsj', 'https://feeds.a.dj.com/rss/RSSWSJD.xml'),
-    new Feed('nyt', 'https://archive.nytimes.com/www.nytimes.com/services/xml/rss/index.html?mcubz=0'),
-    new Feed('yahoo', 'https://www.yahoo.com/news/rss/world')];
+class FeedFeeder {
+    constructor(){
+        this.proxy = "https://cors-anywhere.herokuapp.com/";
+        // const proxy = "https://cors-proxy.htmldriven.com/?url=";
+        // const proxy = "http://www.whateverorigin.org/get?url=";
+        this.feedKey = "busyBodyFeeds";
+        this.feeds = [new Feed('cnn', 'http://rss.cnn.com/rss/cnn_topstories.rss'),
+            new Feed('bbc', 'http://feeds.bbci.co.uk/news/rss.xml#'),
+            new Feed('fox', 'http://feeds.foxnews.com/foxnews/latest'),
+            new Feed('wsj', 'https://feeds.a.dj.com/rss/RSSWSJD.xml'),
+            new Feed('nyt', 'https://archive.nytimes.com/www.nytimes.com/services/xml/rss/index.html?mcubz=0'),
+            new Feed('yahoo', 'https://www.yahoo.com/news/rss/world')];
+        this.getFeeds = this.getFeeds.bind(this);
+        this.getProxy = this.getProxy.bind(this);
+        this.getStoredFeeds = this.getStoredFeeds.bind(this);
+        this.setStoredFeeds = this.setStoredFeeds.bind(this);
+        this.addAFeed = this.addAFeed.bind(this);
+        this.initialize();
+    }
 
-function getFeeds(){
-    return feeds.map((feed) => {
-        return axios.get(proxy + encodeURI(feed.getPath()));
-    });
-}
+    initialize(){
+        let storedFeeds = this.getStoredFeeds();
+        if(storedFeeds.length > 0){
+            this.feeds = storedFeeds;
+        } else {
+            this.setStoredFeeds(this.feeds);
+        }
+    }
 
-function addFeed(id, path){
-    if(id && path){
-        feeds.push(new Feed(id, path));
-    } else {
-        console.error('invalid feed');
+    getFeeds(){
+        let currentFeeds = this.getStoredFeeds();
+
+        return currentFeeds.map((feed) => {
+            return axios.get(this.proxy + encodeURI(feed["path"]));
+        });
+    }
+
+    getProxy(){
+        return this.proxy;
+    }
+
+    getStoredFeeds(){
+        try {
+            return JSON.parse(localStorage.getItem(this.feedKey));
+        } catch(e){
+            return [];
+        }
+    }
+
+    setStoredFeeds(feeds){
+        localStorage.setItem(this.feedKey, JSON.stringify(feeds));
+    }
+
+    addAFeed(id, path){
+        let currentFeeds = this.getStoredFeeds();
+        currentFeeds.unshift(new Feed(id, path));
+        this.setStoredFeeds(currentFeeds);
     }
 }
 
-function getProxy(){
-    return proxy;
-}
+export default new FeedFeeder();
 
-export {getFeeds, addFeed, getProxy};
+
+
+// localStorage.setItem(feedKey, JSON.stringify(feeds));
+//
+// function getStoredFeeds(){
+//     try {
+//         return JSON.parse(localStorage.getItem(feedKey));
+//     } catch(e){
+//         return [];
+//     }
+// }
+//
+// function setStoredFeeds(feeds){
+//     localStorage.setItem(feedKey, feeds);
+// }
+//
+// function getFeeds(){
+//     let currentFeeds = getStoredFeeds();
+//
+//     return currentFeeds.map((feed) => {
+//         return axios.get(proxy + encodeURI(feed.getPath()));
+//     });
+// }
+//
+// function addAFeed(id, path){
+//     let currentFeeds = getStoredFeeds();
+//     currentFeeds.unshift(new Feed(id, path));
+//     setStoredFeeds(currentFeeds);
+// }
+//
+// function getProxy(){
+//     return proxy;
+// }
+

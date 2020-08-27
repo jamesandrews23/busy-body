@@ -22,7 +22,7 @@ import TextField from "@material-ui/core/TextField/TextField";
 import DialogActions from "@material-ui/core/DialogActions/DialogActions";
 import axios from "axios";
 import convertXmlToJson from "./Parser";
-import {getProxy} from "./FeedFeeder";
+import FeedFeeder from "./FeedFeeder";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { green } from '@material-ui/core/colors';
 import Alert from '@material-ui/lab/Alert';
@@ -172,13 +172,13 @@ export default function Main(props){
                 return Promise.reject(error);
             });
 
-            instance.get(getProxy() + encodeURI(url))
+            instance.get(FeedFeeder.getProxy() + encodeURI(url))
                 .then(response => {
                     if(response.data){
                         try {
                             let convertedFeed = convertXmlToJson(response.data);
                             if(convertedFeed && convertedFeed["channel"]){
-                                props.addFeed(convertedFeed["channel"]);
+                                props.addFeed(convertedFeed["channel"], url);
                             } else {
                                 setError(true);
                                 setErrorMsg("Failed to load RSS Feed: " + url);
