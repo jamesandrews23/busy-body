@@ -63,6 +63,8 @@ function getImageUrl(card){
         url = card["media:content"]["@url"];
     } else if(card["media:group"] && card["media:group"]["media:content"] && card["media:group"]["media:content"][1]["@url"]){
         url = card["media:group"]["media:content"][1]["@url"];
+    } else if(card["media:thumbnail"] && card["media:thumbnail"]["@url"]){
+        url = card["media:thumbnail"]["@url"];
     } else {
         if(card.rssImage && card.rssImage.url){
             url = card.rssImage.url;
@@ -117,7 +119,7 @@ export default function NewsTiles(props) {
                 {/* End hero unit */}
                 <Grid container spacing={4}>
                     {pages.map((card, index, list) => (
-                        <Grow in={true}>
+                        <Grow key={index} in={true}>
                             <Grid item key={index} xs={12} sm={6} md={4}>
                                 <Card className={classes.card}>
                                     <CardHeader

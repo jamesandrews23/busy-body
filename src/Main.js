@@ -132,8 +132,9 @@ export default function Main(props){
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
-    const [error, setError] = React.useState(false);
-    const [errorMsg, setErrorMsg] = React.useState("An error has occurred. Please try again later");
+    const [showAlert, setShowAlert] = React.useState(false);
+    const [alertMsg, setAlertMsg] = React.useState("An error has occurred. Please try again later");
+    const [alertType, setAlertType] = React.useState("error");
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -179,19 +180,22 @@ export default function Main(props){
                             let convertedFeed = convertXmlToJson(response.data);
                             if(convertedFeed && convertedFeed["channel"]){
                                 props.addFeed(convertedFeed["channel"], url);
+                                setShowAlert(true);
+                                setAlertMsg("Feed " + url + " successfully added!");
+                                setAlertType("success");
                             } else {
-                                setError(true);
-                                setErrorMsg("Failed to load RSS Feed: " + url);
+                                setShowAlert(true);
+                                setAlertMsg("Failed to load RSS Feed: " + url);
                             }
                         } catch(error){
-                            setError(true);
-                            setErrorMsg("Failed to load RSS Feed: " + url);
+                            setShowAlert(true);
+                            setAlertMsg("Failed to load RSS Feed: " + url);
                         }
                     }
                 })
                 .catch(error => {
-                    setError(true);
-                    setErrorMsg("Failed to load RSS Feed: " + url);
+                    setShowAlert(true);
+                    setAlertMsg("Failed to load RSS Feed: " + url);
                 });
         }
     };
@@ -236,7 +240,7 @@ export default function Main(props){
                         </Typography>
                     </Container>
                 </div>
-                {error && errorMsg && <Alert severity="error" onClose={() => setError(false)}>{errorMsg}</Alert>}
+                {showAlert && alertMsg && <Alert severity={alertType} onClose={() => setShowAlert(false)}>{alertMsg}</Alert>}
                 <Tooltip title="Add RSS Feed">
                     <Fab color="secondary" aria-label="add" className={classes.add} onClick={handleClickOpen}>
                         <AddIcon />

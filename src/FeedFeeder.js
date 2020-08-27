@@ -25,7 +25,7 @@ class FeedFeeder {
             new Feed('bbc', 'http://feeds.bbci.co.uk/news/rss.xml#'),
             new Feed('fox', 'http://feeds.foxnews.com/foxnews/latest'),
             new Feed('wsj', 'https://feeds.a.dj.com/rss/RSSWSJD.xml'),
-            new Feed('nyt', 'https://archive.nytimes.com/www.nytimes.com/services/xml/rss/index.html?mcubz=0'),
+            new Feed('nyt', 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml'),
             new Feed('yahoo', 'https://www.yahoo.com/news/rss/world')];
         this.getFeeds = this.getFeeds.bind(this);
         this.getProxy = this.getProxy.bind(this);
