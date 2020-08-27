@@ -24,8 +24,8 @@ import axios from "axios";
 import convertXmlToJson from "./Parser";
 import {getProxy} from "./FeedFeeder";
 import CircularProgress from '@material-ui/core/CircularProgress';
-import clsx from 'clsx';
 import { green } from '@material-ui/core/colors';
+import Alert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -115,7 +115,15 @@ const useStyles = makeStyles((theme) => ({
         '&:hover': {
             backgroundColor: green[700],
         },
-    }
+    },
+    buttonProgress: {
+        color: green[500],
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        marginTop: -12,
+        marginLeft: -12,
+    },
 }));
 
 
@@ -124,11 +132,8 @@ export default function Main(props){
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
-    const [success, setSuccess] = React.useState(false);
-
-    const buttonClassname = clsx({
-        [classes.buttonSuccess]: success,
-    });
+    const [error, setError] = React.useState(false);
+    const [errorMsg, setErrorMsg] = React.useState("An error has occurred. Please try again later");
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -142,43 +147,51 @@ export default function Main(props){
         let url = document.getElementById('name').value;
         if(url){
             const instance = axios.create();
-            instance.defaults.timeout = 2500;
+            instance.defaults.timeout = 10000;
             // Add a request interceptor
             instance.interceptors.request.use(function (config) {
                 setLoading(true);
                 return config;
             }, function (error) {
                 // Do something with request error
+                setLoading(false);
+                setOpen(false);
                 return Promise.reject(error);
             });
 
             // Add a response interceptor
             instance.interceptors.response.use(function (response) {
                 setLoading(false);
-                setSuccess(true);
+                setOpen(false);
                 return response;
             }, function (error) {
                 // Any status codes that falls outside the range of 2xx cause this function to trigger
                 // Do something with response error
+                setLoading(false);
+                setOpen(false);
                 return Promise.reject(error);
             });
-            return instance.get(getProxy() + encodeURI(url))
+
+            instance.get(getProxy() + encodeURI(url))
                 .then(response => {
                     if(response.data){
                         try {
                             let convertedFeed = convertXmlToJson(response.data);
-                            if(convertedFeed){
-                                props.addFeed(convertedFeed);
+                            if(convertedFeed && convertedFeed["channel"]){
+                                props.addFeed(convertedFeed["channel"]);
                             } else {
-                                return false;
+                                setError(true);
+                                setErrorMsg("Failed to load RSS Feed: " + url);
                             }
                         } catch(error){
-
+                            setError(true);
+                            setErrorMsg("Failed to load RSS Feed: " + url);
                         }
                     }
                 })
                 .catch(error => {
-                    console.log(error);
+                    setError(true);
+                    setErrorMsg("Failed to load RSS Feed: " + url);
                 });
         }
     };
@@ -223,6 +236,7 @@ export default function Main(props){
                         </Typography>
                     </Container>
                 </div>
+                {error && errorMsg && <Alert severity="error" onClose={() => setError(false)}>{errorMsg}</Alert>}
                 <Tooltip title="Add RSS Feed">
                     <Fab color="secondary" aria-label="add" className={classes.add} onClick={handleClickOpen}>
                         <AddIcon />
@@ -251,12 +265,11 @@ export default function Main(props){
                             Cancel
                         </Button>
                         <div className={classes.wrapper}>
-                            <Button onClick={subscribe} color="primary" disabled={loading} className={buttonClassname}>
+                            <Button onClick={subscribe} color="primary" disabled={loading}>
                                 Subscribe
                             </Button>
                             {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
                         </div>
-
                     </DialogActions>
                 </Dialog>
             </div>

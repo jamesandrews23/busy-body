@@ -31,6 +31,7 @@ class App extends React.Component {
         this.search = this.search.bind(this);
         this.sort = this.sort.bind(this);
         this.transformFeeds = this.transformFeeds.bind(this);
+        this.addFeed = this.addFeed.bind(this);
     }
 
     search(e){
@@ -128,8 +129,12 @@ class App extends React.Component {
         return convertedFeeds;
     }
 
-    addFeed(feed){
-        console.log(feed);
+    addFeed(addedFeed){
+        let newFeeds = [];
+        let transformedAddedFeed = this.transformFeeds(addedFeed);
+        let currentFeeds = _.cloneDeep(this.state.rss);
+        newFeeds = newFeeds.concat(transformedAddedFeed, currentFeeds);
+        this.setState({rss: newFeeds});
     }
 
     render(){
