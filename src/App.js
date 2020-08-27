@@ -4,7 +4,7 @@ import _ from 'lodash';
 import convertXmlToJson from './Parser';
 import Main from './Main';
 import FeedFeeder from './FeedFeeder';
-import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
 let rssOriginal = [];
 let rssTitles = [];

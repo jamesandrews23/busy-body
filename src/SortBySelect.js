@@ -3,7 +3,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -41,9 +40,6 @@ export default function SortBySelect(props){
 
     return (
         <FormControl className={classes.formControl}>
-            {/*<InputLabel shrink id="sortBy" className={classes.sortColor}>*/}
-                {/*Sort By*/}
-            {/*</InputLabel>*/}
             <Select
                 labelId="sortBy"
                 id="sort"
