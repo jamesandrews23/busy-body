@@ -37,7 +37,7 @@ class FeedFeeder {
 
     initialize(){
         let storedFeeds = this.getStoredFeeds();
-        if(storedFeeds.length > 0){
+        if(storedFeeds && storedFeeds.length > 0){
             this.feeds = storedFeeds;
         } else {
             this.setStoredFeeds(this.feeds);
@@ -58,7 +58,8 @@ class FeedFeeder {
 
     getStoredFeeds(){
         try {
-            return JSON.parse(localStorage.getItem(this.feedKey));
+            let parsedFeed = JSON.parse(localStorage.getItem(this.feedKey));
+            return parsedFeed || [];
         } catch(e){
             return [];
         }
