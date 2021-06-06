@@ -17,9 +17,7 @@ class Feed {
 
 class FeedFeeder {
     constructor(){
-        this.proxy = "https://cors-anywhere.herokuapp.com/";
-        // const proxy = "https://cors-proxy.htmldriven.com/?url=";
-        // const proxy = "http://www.whateverorigin.org/get?url=";
+        this.proxy = "https://thingproxy.freeboard.io/fetch/";
         this.feedKey = "busyBodyFeeds";
         this.feeds = [new Feed('cnn', 'http://rss.cnn.com/rss/cnn_topstories.rss'),
             new Feed('bbc', 'http://feeds.bbci.co.uk/news/rss.xml#'),
